@@ -17,12 +17,42 @@ namespace MultiplayerARPG.MMO
         /// </summary>
         public void tryMMOLogin()
         {
+            if (LoggingIn)
+                return;
+            // Clear stored username and password
+            PlayerPrefs.SetString(keyUsername, string.Empty);
+            PlayerPrefs.SetString(keyPassword, string.Empty);
+            PlayerPrefs.Save();
+
+            UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
+            if (string.IsNullOrEmpty(Username))
+            {
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString()));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(Password))
+            {
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString()));
+                return;
+            }
+
+            if ((toggleRememberUsername != null && toggleRememberUsername.isOn) ||
+                (toggleAutoLogin != null && toggleAutoLogin.isOn))
+            {
+                // Remember username
+                PlayerPrefs.SetString(keyUsername, Username);
+                PlayerPrefs.Save();
+            }
+
+            LoggingIn = true;
+
             Debug.Log("proceedMMOLogin " + Username + Password);
             PlayerPrefs.SetString(keyUsername, Username);
             //MMOClientInstance.Singleton.RequestUserLogin(Username, Password, OnLoginCustom);
-            MMOClientInstance.Singleton.RequestFirebaseLogin(Username, Password, OnFirebaseAuthCustom);
+            MMOClientInstance.Singleton.RequestFirebaseLogin(Username, Password, OnFirebaseLogin);
         }
-        public void OnFirebaseAuthCustom(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFirebaseAuthLoginMessage response)
+        public void OnFirebaseLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFirebaseAuthLoginMessage response)
         {
             LoggingIn = false;
             Debug.Log(responseCode);

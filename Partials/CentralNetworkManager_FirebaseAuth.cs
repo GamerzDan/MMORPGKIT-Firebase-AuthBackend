@@ -24,6 +24,7 @@ namespace MultiplayerARPG.MMO
         protected void DevExtRegisterFirebaseAuthMessages()
         {
             RegisterRequestToServer<RequestUserLoginMessage, ResponseFirebaseAuthLoginMessage>(MMORequestTypes.RequestFirebaseLogin, HandleRequestFirebaseLogin);
+            RegisterRequestToServer<RequestUserRegisterMessage, ResponseFirebaseAuthLoginMessage>(MMORequestTypes.RequestFirebaseRegister, HandleRequestFirebaseRegister);
         }
 #endif
     }
@@ -31,8 +32,12 @@ namespace MultiplayerARPG.MMO
     public static partial class MMORequestTypes
     {
         public const ushort RequestFirebaseLogin = 5010;
+        public const ushort RequestFirebaseRegister = 5011;
     }
 
+    /// <summary>
+    /// General Response handler for firebase, we pass string or jsonText as response in it
+    /// </summary>
     public struct ResponseFirebaseAuthLoginMessage : INetSerializable
     {
         public string response;
@@ -70,6 +75,16 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
+        public bool RequestFirebaseRegister(string email, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
+        {
+            return ClientSendRequest(MMORequestTypes.RequestFirebaseRegister, new RequestUserRegisterMessage()
+            {
+                username = email,
+                password = password,
+                email = email
+            }, responseDelegate: callback);
+        }
+
         protected async UniTaskVoid HandleRequestFirebaseLogin(
             RequestHandlerData requestHandler,
             RequestUserLoginMessage request,
@@ -82,64 +97,22 @@ namespace MultiplayerARPG.MMO
             //string email = request.email;
             Debug.Log("Pre API call");
             callFirebaseLogin(username, password, result);
-            Debug.Log("Post API call");
-            /*
-            List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
-            formData.Add(new MultipartFormDataSection("email", username.Trim()));
-            formData.Add(new MultipartFormDataSection("password", password.Trim()));
-            Debug.Log("email=" + username.Trim() + "&password=" + password.Trim());
-            Debug.Log(formData.ToArray());
-            UnityWebRequest www = UnityWebRequest.Post(FirebaseConfig.FirebaseEndpoint + ":signInWithPassword?key=" + FirebaseConfig.FirebaseKey, formData);
-            try { 
-                var asyncOp = await www.SendWebRequest();
-                if (www.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.Log("FirebaseApiCallFailed- " + www.error);
-                    message = "FirebaseApiCallFailed- " + www.error;
-                }
-                else
-                {
-                    Debug.Log("FirebaseApiCallFailed- " + www.downloadHandler.text);
-                    message = www.downloadHandler.text;
-                }
-            } catch(Exception e)
-            {
-                Debug.Log(e.Message);
-                message = e.Message;
-            }
+            Debug.Log("Post API call");           
+        }
 
-            /*
-            AsyncResponseData<FindUsernameResp> findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
-            {
-                Username = username
-            });
-            if (findUsernameResp.Response.FoundAmount < 1)
-                message = UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD;
-            else if (string.IsNullOrEmpty(username) || username.Length < minUsernameLength)
-                message = UITextKeys.UI_ERROR_USERNAME_TOO_SHORT;
-            else if (username.Length > maxUsernameLength)
-                message = UITextKeys.UI_ERROR_USERNAME_TOO_LONG;
-            else if (string.IsNullOrEmpty(password) || password.Length < minPasswordLength)
-            {
-                message = UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT;
-            }
-            else
-            {
-                await DbServiceClient.UpdateUserLoginAsync(new CreateUserLoginReq()
-                {
-                    Username = username,
-                    Password = password,
-                    Email = email,
-                });
-            }
-            
-            // Response
-            result.Invoke(AckResponseCode.Success,
-                new ResponseFirebaseAuthLoginMessage()
-                {
-                    response = message,
-                });
-            */
+        protected async UniTaskVoid HandleRequestFirebaseRegister(
+            RequestHandlerData requestHandler,
+            RequestUserRegisterMessage request,
+            RequestProceedResultDelegate<ResponseFirebaseAuthLoginMessage> result)
+        {
+            string message = "";
+            string email = request.username;
+            string password = request.password;
+            NameValidating.overrideUsernameValidating = customNameValidation;
+            //string email = request.email;
+            Debug.Log("Pre API call");
+            callFirebaseRegister(email, password, result);
+            Debug.Log("Post API call");
         }
 #endif
     }
@@ -150,6 +123,10 @@ namespace MultiplayerARPG.MMO
         public void RequestFirebaseLogin(string username, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
         {
             centralNetworkManager.RequestFirebaseLogin(username, password, callback);
+        }
+        public void RequestFirebaseRegister(string email, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
+        {
+            centralNetworkManager.RequestFirebaseRegister(email, password, callback);
         }
     }
 }

@@ -15,6 +15,47 @@ namespace MultiplayerARPG.MMO
         public string FirebaseEndpoint = @"https://identitytoolkit.googleapis.com/v1/accounts";
         public string FirebaseKey = @"AIzaSyA4sj5mUuvJIQWp1mdxm5Xbf_ffQLLPqIM";
 
+
+        public void callFirebaseRegister(string email, string password, RequestProceedResultDelegate<ResponseFirebaseAuthLoginMessage> result)
+        {
+            string url = FirebaseEndpoint + ":signUp?key=" + FirebaseKey;
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data["email"] = email.ToLower().Trim();
+            data["password"] = password.Trim();
+
+            var currentRequest = new RequestHelper
+            {
+                Uri = url,
+                Method = "POST",
+                ContentType = "application/x-www-form-urlencoded", // Here you can attach a UploadHandler/DownloadHandler too :)
+                SimpleForm = data,
+                Params = new Dictionary<string, string> { { "key", FirebaseKey } }
+            };
+
+            RestClient.Request(currentRequest).Then(res =>
+            {
+                Debug.Log("callFirebaseRegister Response: " + res.Text);
+                FirebaseRes dat = JsonUtility.FromJson<FirebaseRes>(res.Text);
+                //Also sent email verification mail
+                callFirebaseSendEmailVerification(dat.idToken, "VERIFY_EMAIL", null);
+                result.Invoke(AckResponseCode.Success,
+                    new ResponseFirebaseAuthLoginMessage()
+                    {
+                        response = res.Text,
+                    });
+            }).Catch(err =>
+            {
+                var error = err as RequestException;
+                Debug.Log("callFirebaseRegister Error: " + err.Message);
+                Debug.Log("callFirebaseRegister ErrorResponse: " + error.Response);
+                result.Invoke(AckResponseCode.Error,
+                    new ResponseFirebaseAuthLoginMessage()
+                    {
+                        response = error.Response,
+                    });
+            });
+        }
+
         /// <summary>
         /// Login flow is, tryFirebaseLogin->checkEmailVerified||accDisabled->doKitLogin
         /// At any part if there is errorResponse, return to client
