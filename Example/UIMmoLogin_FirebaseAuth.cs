@@ -24,7 +24,18 @@ namespace MultiplayerARPG.MMO
         }
         public void OnFirebaseAuthCustom(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFirebaseAuthLoginMessage response)
         {
+            LoggingIn = false;
+            Debug.Log(responseCode);
             Debug.Log(response.response);
+            //If firebaseLogin was not success
+            if (responseCode != AckResponseCode.Success)
+            {
+                FirebaseErrorRes error = JsonUtility.FromJson<FirebaseErrorRes>(response.response);
+                UISceneGlobal.Singleton.ShowMessageDialog(error.error.code + " Error", error.error.message);
+                return;
+            }
+            //If success, try Kit's login
+            MMOClientInstance.Singleton.RequestUserLogin(Username, Password, OnLoginCustom);
         }
 
         /// <summary>
