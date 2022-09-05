@@ -49,7 +49,6 @@ namespace MultiplayerARPG.MMO
                 var error = err as RequestException;
                 Debug.Log("callFirebaseLoginError: " + err.Message);
                 Debug.Log("callFirebaseLoginErrorResponse: " + error.Response);
-                Debug.Log("callFirebaseLoginErrorRequest: " + error.Request.BodyString);
                 result.Invoke(AckResponseCode.Error,
                     new ResponseFirebaseAuthLoginMessage()
                     {
@@ -86,6 +85,7 @@ namespace MultiplayerARPG.MMO
                 //Get User details to check if emailVerified and accDisabled
                 FirebaseUsersRes userData = dat.users[0];
                 FirebaseErrorRes error = new FirebaseErrorRes();
+                error.error = new FirebaseErrorDetailsRes();
                 if (userData.disabled)
                 {
                     error.error.code = 400;
@@ -96,32 +96,36 @@ namespace MultiplayerARPG.MMO
                         response = JsonUtility.ToJson(error),
                     });
                 }
-                if(!userData.emailVerified)
+                else if (!userData.emailVerified)
                 {
                     //Send Email Verification Link, donot send callback object
                     callFirebaseSendEmailVerification(idToken, "VERIFY_EMAIL", null);
 
                     error.error.code = 400;
                     error.error.message = "EMAIL_NOT_VERIFIED";
+                    string message = JsonUtility.ToJson(error);
+                    Debug.Log(message);
                     result.Invoke(AckResponseCode.Error,
                     new ResponseFirebaseAuthLoginMessage()
                     {
-                        response = JsonUtility.ToJson(error),
+                        response = message,
                     });
                 }
-                //Return to client for kit login
-                result.Invoke(AckResponseCode.Success,
-                    new ResponseFirebaseAuthLoginMessage()
-                    {
-                        response = res.Text,
-                    });
+                else
+                {
+                    //Return to client for kit login
+                    result.Invoke(AckResponseCode.Success,
+                        new ResponseFirebaseAuthLoginMessage()
+                        {
+                            response = res.Text,
+                        });
+                }
 
             }).Catch(err =>
             {
                 var error = err as RequestException;
                 Debug.Log("callFirebaseUserDataError: " + err.Message);
                 Debug.Log("callFirebaseUserDataErrorResponse: " + error.Response);
-                Debug.Log("callFirebaseUserDataErrorRequest: " + error.Request.BodyString);
                 result.Invoke(AckResponseCode.Error,
                     new ResponseFirebaseAuthLoginMessage()
                     {
@@ -163,7 +167,6 @@ namespace MultiplayerARPG.MMO
                 var error = err as RequestException;
                 Debug.Log("callFirebaseSendEmailVerification Error: " + err.Message);
                 Debug.Log("callFirebaseSendEmailVerification ErrorResponse: " + error.Response);
-                Debug.Log("callFirebaseSendEmailVerification ErrorRequest: " + error.Request.BodyString);
                 result.Invoke(AckResponseCode.Error,
                     new ResponseFirebaseAuthLoginMessage()
                     {

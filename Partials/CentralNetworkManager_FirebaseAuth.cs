@@ -49,6 +49,17 @@ namespace MultiplayerARPG.MMO
 
     public partial class CentralNetworkManager
     {
+        /// <summary>
+        /// Custom Name validation to be used in delegate of NameValidating class
+        /// Currently using it to disable name validation as we will use email for username
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        protected bool customNameValidation(string name)
+        {
+            Debug.Log("Using customNameValidation");
+            return true;
+        }
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public bool RequestFirebaseLogin(string username, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
         {
@@ -67,6 +78,7 @@ namespace MultiplayerARPG.MMO
             string message = "";
             string username = request.username;
             string password = request.password;
+            NameValidating.overrideUsernameValidating = customNameValidation;
             //string email = request.email;
             Debug.Log("Pre API call");
             callFirebaseLogin(username, password, result);

@@ -28,6 +28,11 @@ namespace MultiplayerARPG.MMO
             Debug.Log(responseCode);
             Debug.Log(response.response);
             //If firebaseLogin was not success
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog("Timeout Error", "MMO Server did not respond in time");
+                return;
+            }
             if (responseCode != AckResponseCode.Success)
             {
                 FirebaseErrorRes error = JsonUtility.FromJson<FirebaseErrorRes>(response.response);
@@ -75,15 +80,19 @@ namespace MultiplayerARPG.MMO
             Debug.Log("OnLoginCustomResponseCode: " + responseCode);
             Debug.Log("OnLoginCustomResponseMessage: " + response.message);
             //If login was not success
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog("Timeout Error", "MMO Server did not respond in time");
+                return;
+            }
             if (responseCode != AckResponseCode.Success)
             {
                 //Backend reports incorrect user/password so either mismatch or user not exist, lets try to create the user first
+                //But if user exists, that means need to reset/update password
                 if (response.message.ToString() == "UI_ERROR_INVALID_USERNAME_OR_PASSWORD")
                 {
                     MMOClientInstance.Singleton.RequestUserRegister(Username, Password, "", OnLoginRegister);
                 }
-                //Debug.Log("Game login failed, update password from firebase " + Username + Password);
-                //MMOClientInstance.Singleton.RequestPasswordReset(Username, Password, OnResetCustom);
                 return;
             }
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
@@ -149,6 +158,11 @@ namespace MultiplayerARPG.MMO
             Debug.Log("OnLoginRegisterRespCode: " + responseCode);
             Debug.Log("OnLoginRegisterRespMessage: " + response.message);
             //If not success, means user exists but Firebase and MMO password donot match, so update password
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog("Timeout Error", "MMO Server did not respond in time");
+                return;
+            }
             if (responseCode != AckResponseCode.Success)
             {
                 Debug.Log("OnLoginRegister: " + "Game login failed, update password from firebase for " + Username);
@@ -166,6 +180,11 @@ namespace MultiplayerARPG.MMO
         {
             Debug.Log("OnResetCustomCode: " + responseCode);
             Debug.Log("OnResetCustomMsg: " + response.message);
+            if (responseCode != AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog("Timeout Error", "MMO Server did not respond in time");
+                return;
+            }
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
             {
                 Debug.Log("OnResetCustom: " + response.message);
