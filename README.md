@@ -31,7 +31,7 @@ With this addon, any password change/reset needs to be done from Firebase.**
 ## Required (install them before installing this addon)
 #### MMORPGKIT   (tested on v1.76)
 https://assetstore.unity.com/packages/templates/systems/mmorpg-kit-2d-3d-survival-110188
-#### Rest Client for Unity (tested on 2.62)    
+#### Rest Client for Unity (tested on 2.62)  (INCLUDED IN THE PROJECT, DELETE IF INSTALLING FROM ASSETSTORE)  
 https://assetstore.unity.com/packages/tools/network/rest-client-for-unity-102501        
 #### MMORPGKIT-RESET-PASSWORD-ADDON  
 https://github.com/GamerzDan/MMORPGKIT-Reset-Password-Addon    
@@ -41,7 +41,10 @@ https://firebase.google.com/
 ---
 
 ## Setup
-0. Create your Free Firebase account by signing in with a google account (https://console.firebase.google.com/) and setup your project.  Open your project's settings and copy the **WEB API KEY**. You need to save/replace this key in **CentralNetworkManager_APIManager**.cs (under APIManager folder).
+0. Create your Free Firebase account by signing in with a google account (https://console.firebase.google.com/) and setup your project.  
+On the left hand menu, Click Authentication (under Build menu) and enable Firebase Authentication for your project and also enable email (password signin) provider for it.    
+Open your project's settings and copy the **WEB API KEY**. You need to save/replace this key in **CentralNetworkManager_APIManager**.cs (under APIManager folder).    
+![enter image description here](https://i.imgur.com/kOTz0Fw.jpeg)
 ![enter image description here](https://i.imgur.com/57cpME3.jpeg)
 1. Increase username character length limit to **255** in **CentralNetworkManager** (via Unity Inspector)
 2. Install other Required Dependencies
