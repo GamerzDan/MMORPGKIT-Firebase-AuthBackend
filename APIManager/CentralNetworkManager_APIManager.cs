@@ -12,8 +12,8 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
     public partial class CentralNetworkManager
     {
-        public string FirebaseEndpoint = @"https://identitytoolkit.googleapis.com/v1/accounts";
-        public string FirebaseKey = @"AIzaSyA4sj5mUuvJIQWp1mdxm5Xbf_ffQLLPqIM";
+        protected string FirebaseEndpoint = @"https://identitytoolkit.googleapis.com/v1/accounts";
+        protected string FirebaseKey = @"AIzaSyA4sj5mUuvJIQWp1mdxm5Xbf_ffQLLPqIM";
 
 
         public void callFirebaseRegister(string email, string password, RequestProceedResultDelegate<ResponseFirebaseAuthLoginMessage> result)

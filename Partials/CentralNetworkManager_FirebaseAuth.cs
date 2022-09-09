@@ -9,13 +9,6 @@ using System;
 
 namespace MultiplayerARPG.MMO
 {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-    public static class FirebaseConfig
-    {
-        public const string FirebaseEndpoint = @"https://identitytoolkit.googleapis.com/v1/accounts";
-        public const string FirebaseKey = @"AIzaSyA4sj5mUuvJIQWp1mdxm5Xbf_ffQLLPqIM";
-    }
-#endif
 
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
