@@ -34,14 +34,35 @@ namespace MultiplayerARPG.MMO
     public struct ResponseFirebaseAuthLoginMessage : INetSerializable
     {
         public string response;
+        public UITextKeys message;
+        /// <summary>
+        /// This is mmorpgkit's internal userid
+        /// </summary>
+        public string userId;
+        public string accessToken;
+        public long unbanTime;
+        /// <summary>
+        /// This is the actual username or steamid in mmorgkit
+        /// </summary>
+        public string username;
         public void Deserialize(NetDataReader reader)
         {
             response = reader.GetString();
+            message = (UITextKeys)reader.GetPackedUShort();
+            userId = reader.GetString();
+            accessToken = reader.GetString();
+            unbanTime = reader.GetPackedLong();
+            username = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(response);
+            writer.PutPackedUShort((ushort)message);
+            writer.Put(userId);
+            writer.Put(accessToken);
+            writer.PutPackedLong(unbanTime);
+            writer.Put(username);
         }
     }
 
@@ -116,10 +137,28 @@ namespace MultiplayerARPG.MMO
         public void RequestFirebaseLogin(string username, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
         {
             centralNetworkManager.RequestFirebaseLogin(username, password, callback);
+            //CentralNetworkManager.RequestFirebaseLogin(username, password, (responseHandler, responseCode, response) => OnRequestFirebaseLogin(responseHandler, responseCode, response, callback).Forget());
         }
         public void RequestFirebaseRegister(string email, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
         {
             centralNetworkManager.RequestFirebaseRegister(email, password, callback);
+        }
+
+        private async UniTaskVoid OnRequestFirebaseLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseFirebaseAuthLoginMessage response, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
+        {
+            await UniTask.Yield();
+
+            if (callback != null)
+                callback.Invoke(responseHandler, responseCode, response);
+
+            GameInstance.UserId = string.Empty;
+            GameInstance.UserToken = string.Empty;
+            GameInstance.SelectedCharacterId = string.Empty;
+            if (responseCode == AckResponseCode.Success)
+            {
+                //GameInstance.UserId = response.userId;
+                //GameInstance.UserToken = response.accessToken;
+            }
         }
     }
 }
