@@ -79,7 +79,7 @@ namespace MultiplayerARPG.MMO
             Debug.Log("Using customNameValidation");
             return true;
         }
-#if UNITY_STANDALONE && !CLIENT_BUILD
+
         public bool RequestFirebaseLogin(string username, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestFirebaseLogin, new RequestUserLoginMessage()
@@ -104,6 +104,7 @@ namespace MultiplayerARPG.MMO
             RequestUserLoginMessage request,
             RequestProceedResultDelegate<ResponseFirebaseAuthLoginMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             string message = "";
             string username = request.username;
             string password = request.password;
@@ -111,7 +112,8 @@ namespace MultiplayerARPG.MMO
             //string email = request.email;
             Debug.Log("Pre API call");
             callFirebaseLogin(username, password, result);
-            Debug.Log("Post API call");           
+            Debug.Log("Post API call");      
+#endif
         }
 
         protected async UniTaskVoid HandleRequestFirebaseRegister(
@@ -119,6 +121,7 @@ namespace MultiplayerARPG.MMO
             RequestUserRegisterMessage request,
             RequestProceedResultDelegate<ResponseFirebaseAuthLoginMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             string message = "";
             string email = request.username;
             string password = request.password;
@@ -127,12 +130,12 @@ namespace MultiplayerARPG.MMO
             Debug.Log("Pre API call");
             callFirebaseRegister(email, password, result);
             Debug.Log("Post API call");
-        }
 #endif
-    }
+        }
+        }
 
 
-    public partial class MMOClientInstance : MonoBehaviour
+        public partial class MMOClientInstance : MonoBehaviour
     {
         public void RequestFirebaseLogin(string username, string password, ResponseDelegate<ResponseFirebaseAuthLoginMessage> callback)
         {
