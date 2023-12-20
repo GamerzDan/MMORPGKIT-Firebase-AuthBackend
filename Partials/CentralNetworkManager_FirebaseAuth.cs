@@ -108,6 +108,7 @@ namespace MultiplayerARPG.MMO
             string message = "";
             string username = request.username;
             string password = request.password;
+            NameExtensions.overrideUsernameValidating = customNameValidation;
             //string email = request.email;
             Debug.Log("Pre API call");
             callFirebaseLogin(username, password, result);
@@ -124,6 +125,7 @@ namespace MultiplayerARPG.MMO
             string message = "";
             string email = request.username;
             string password = request.password;
+            NameExtensions.overrideUsernameValidating = customNameValidation;
             //string email = request.email;
             Debug.Log("Pre API call");
             callFirebaseRegister(email, password, result);
