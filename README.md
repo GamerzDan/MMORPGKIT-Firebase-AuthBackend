@@ -46,10 +46,11 @@ On the left hand menu, Click Authentication (under Build menu) and enable Fireba
 Open your project's settings and copy the **WEB API KEY**. You need to save/replace this key in **CentralNetworkManager_APIManager**.cs (under APIManager folder).    
 ![enter image description here](https://i.imgur.com/kOTz0Fw.jpeg)
 ![enter image description here](https://i.imgur.com/57cpME3.jpeg)
-1. Increase username character length limit to **255** in **CentralNetworkManager** (via Unity Inspector)
-2. Install other Required Dependencies
-3. Drag and Drop this addon to your project (under Assets folder or any sub-folder within it)
-4. Edit the UIMmoLogin.cs and UIMmoRegister.cs `(UnityMultiplayerARPG/MMO/Scripts/MMOGame/UI/)` classes of the MMORPGKIT to partial classes  
+
+2. Increase username length limit to **255** in **CentralNetworkManager** (SERVER) (via Unity Inspector)
+3. Install other Required Dependencies
+4. Drag and Drop this addon to your project (under Assets folder or any sub-folder within it)
+5. Edit the UIMmoLogin.cs and UIMmoRegister.cs `(UnityMultiplayerARPG/MMO/Scripts/MMOGame/UI/)` classes of the MMORPGKIT to partial classes  
  ```
  Change
  public class UIMmoLogin : UIBase
